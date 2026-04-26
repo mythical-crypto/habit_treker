@@ -1,7 +1,7 @@
 import { getUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { habits, completions } from "@/lib/db/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Flame, Plus, Quote } from "lucide-react";
@@ -33,11 +33,8 @@ export default async function DashboardPage() {
     .from(completions)
     .where(
       and(
-        sql`${completions.date} = ${today}`,
-        sql`${completions.habitId} IN (${sql.join(
-          userHabits.map((h) => sql`${h.id}`),
-          sql`, `
-        )})`
+        eq(completions.date, today),
+        inArray(completions.habitId, userHabits.map((h) => h.id))
       )
     );
 

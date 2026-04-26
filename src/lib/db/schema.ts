@@ -104,7 +104,7 @@ export const habits = pgTable("habits", {
 export const completions = pgTable("completions", {
   id: serial("id").primaryKey(),
   habitId: integer("habit_id")
-    .references(() => habits.id)
+    .references(() => habits.id, { onDelete: "cascade" })
     .notNull(),
   date: date("date").notNull(),
   completed: boolean("completed").default(true),

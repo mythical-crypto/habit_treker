@@ -128,8 +128,12 @@ export default async function HabitsPage() {
 }
 
 function ArchiveButton({ habitId }: { habitId: number }) {
+  async function handleArchive() {
+    "use server";
+    await archiveHabit(habitId);
+  }
   return (
-    <form action={archiveHabit.bind(null, habitId)}>
+    <form action={handleArchive}>
       <Button variant="ghost" size="icon-sm" className="h-8 w-8" type="submit" title="Архивировать">
         <Archive className="h-4 w-4 text-on-surface-variant" />
       </Button>
@@ -138,8 +142,12 @@ function ArchiveButton({ habitId }: { habitId: number }) {
 }
 
 function RestoreButton({ habitId }: { habitId: number }) {
+  async function handleRestore() {
+    "use server";
+    await restoreHabit(habitId);
+  }
   return (
-    <form action={restoreHabit.bind(null, habitId)}>
+    <form action={handleRestore}>
       <Button variant="ghost" size="icon-sm" className="h-8 w-8" type="submit" title="Восстановить">
         <RotateCcw className="h-4 w-4 text-on-surface-variant" />
       </Button>

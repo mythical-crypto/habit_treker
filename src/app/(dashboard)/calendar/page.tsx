@@ -1,7 +1,7 @@
 import { getUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { habits, completions } from "@/lib/db/schema";
-import { eq, sql, and } from "drizzle-orm";
+import { eq, and, gte, lte, inArray } from "drizzle-orm";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameMonth, isToday, subMonths, addMonths } from "date-fns";
 import { ru } from "date-fns/locale";
 import Link from "next/link";
@@ -23,7 +23,6 @@ export default async function CalendarPage({
   const monthEnd = endOfMonth(currentDate);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
   
-  const monthStr = format(currentDate, "yyyy-MM");
   const prevMonth = format(subMonths(currentDate, 1), "yyyy-MM");
   const nextMonth = format(addMonths(currentDate, 1), "yyyy-MM");
 
@@ -39,12 +38,9 @@ export default async function CalendarPage({
         .from(completions)
         .where(
           and(
-            sql`${completions.date} >= ${format(monthStart, "yyyy-MM-dd")}`,
-            sql`${completions.date} <= ${format(monthEnd, "yyyy-MM-dd")}`,
-            sql`${completions.habitId} IN (${sql.join(
-              habitIds.map((id) => sql`${id}`),
-              sql`, `
-            )})`
+            gte(completions.date, format(monthStart, "yyyy-MM-dd")),
+            lte(completions.date, format(monthEnd, "yyyy-MM-dd")),
+            inArray(completions.habitId, habitIds)
           )
         )
     : [];
@@ -55,10 +51,7 @@ export default async function CalendarPage({
     const dayCompletions = monthCompletions.filter(
       (c) => c.date === dateStr && c.completed
     );
-    const totalForDay = userHabits.filter((h) => {
-      // Simple frequency check - assume daily for now
-      return true;
-    }).length;
+    const totalForDay = userHabits.length;
     return {
       date: day,
       completed: dayCompletions.length,
@@ -76,12 +69,7 @@ export default async function CalendarPage({
     ? await db
         .select()
         .from(completions)
-        .where(
-          sql`${completions.habitId} IN (${sql.join(
-            habitIds.map((id) => sql`${id}`),
-            sql`, `
-          )})`
-        )
+        .where(inArray(completions.habitId, habitIds))
         .orderBy(completions.date)
     : [];
 
@@ -141,7 +129,7 @@ export default async function CalendarPage({
         <div className="grid grid-cols-7 gap-1">
           {/* Empty cells for offset */}
           {Array.from({ length: offset }).map((_, i) => (
-            <div key={`offset-cell-${i}`} className="aspect-square" />
+            <div key={`empty-${offset}-${i}`} className="aspect-square" />
           ))}
 
           {dayStats.map(({ date, completed, total }) => {

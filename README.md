@@ -27,7 +27,7 @@ npm install
 
 ### 3. Настройка окружения
 
-Создайте файл `.env.local` в корне проекта:
+Отредактируйте `.env` в корне проекта:
 
 ```env
 # Database
@@ -35,7 +35,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/habit_treker
 
 # Auth
 BETTER_AUTH_SECRET=your-secret-key-min-32-chars-long!!!
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=http://127.0.0.1:3000
 ```
 
 ### 4. Настройка базы данных
@@ -48,11 +48,20 @@ npx drizzle-kit migrate
 
 ### 5. Запуск приложения
 
+**Production-режим (рекомендуется для Windows):**
+
+```bash
+npm run build
+npm start
+```
+
+**Dev-режим (может не работать на Windows из-за бага Turbopack):**
+
 ```bash
 npm run dev
 ```
 
-Откройте [http://localhost:3000](http://localhost:3000) в браузере.
+Откройте в браузере: **http://127.0.0.1:3000/login**
 
 ## Дополнительные команды
 

@@ -117,12 +117,12 @@ export async function deleteHabit(id: number) {
 
 export async function archiveHabit(id: number) {
   const user = await getUser();
-  if (!user) throw new Error("Не авторизован");
+  if (!user) return { success: false, error: "Не авторизован" };
 
   const existing = await db.query.habits.findFirst({
     where: and(eq(habits.id, id), eq(habits.userId, String(user.id))),
   });
-  if (!existing) throw new Error("Привычка не найдена");
+  if (!existing) return { success: false, error: "Привычка не найдена" };
 
   await db
     .update(habits)
@@ -131,16 +131,17 @@ export async function archiveHabit(id: number) {
 
   revalidatePath("/");
   revalidatePath("/habits");
+  return { success: true };
 }
 
 export async function restoreHabit(id: number) {
   const user = await getUser();
-  if (!user) throw new Error("Не авторизован");
+  if (!user) return { success: false, error: "Не авторизован" };
 
   const existing = await db.query.habits.findFirst({
     where: and(eq(habits.id, id), eq(habits.userId, String(user.id))),
   });
-  if (!existing) throw new Error("Привычка не найдена");
+  if (!existing) return { success: false, error: "Привычка не найдена" };
 
   await db
     .update(habits)
@@ -149,6 +150,7 @@ export async function restoreHabit(id: number) {
 
   revalidatePath("/");
   revalidatePath("/habits");
+  return { success: true };
 }
 
 export async function getActiveHabits() {

@@ -79,27 +79,27 @@
 ## Phase 3: Statistics & Analytics
 
 ### 3.1 Statistics Page (`/statistics`)
-- [ ] Weekly/Monthly toggle
-- [ ] Overall completion percentage
-- [ ] Current streaks list by habit
-- [ ] Activity heatmap (by days of week)
-- [ ] Weekly insight cards
+- [x] Weekly/Monthly toggle
+- [x] Overall completion percentage
+- [x] Current streaks list by habit
+- [x] Activity heatmap (by days of week)
+- [x] Weekly insight cards
 
 ### 3.2 Charts
-- [ ] Completion rate line chart (Recharts)
-- [ ] Habit distribution pie chart
-- [ ] Weekly activity bar chart
-- [ ] Streak history visualization
+- [x] Completion rate line chart (Recharts)
+- [x] Habit distribution pie chart
+- [x] Weekly activity bar chart
+- [x] Streak history visualization
 
 ### 3.3 Data Aggregation
-- [ ] Completion rate calculation (SQL)
-- [ ] Streak calculation (SQL gaps-and-islands)
-- [ ] Weekly/monthly aggregation functions
+- [x] Completion rate calculation (SQL)
+- [x] Streak calculation (SQL gaps-and-islands)
+- [x] Weekly/monthly aggregation functions
 
 **Verification:**
-- Statistics page loads with real data
-- Charts render correctly
-- Toggle between week/month updates data
+- [x] Statistics page loads with real data
+- [x] Charts render correctly
+- [x] Toggle between week/month updates data
 
 ---
 

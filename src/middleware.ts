@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const authRoutes = ["/login", "/register"];
-  const protectedRoutes = ["/", "/habits", "/statistics"];
+  const protectedRoutes = ["/", "/habits", "/statistics", "/calendar"];
 
   if (isAuthenticated && authRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.redirect(new URL("/", request.url));
@@ -20,5 +20,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/register", "/habits/:path*", "/statistics"],
+  matcher: ["/", "/login", "/register", "/habits/:path*", "/statistics", "/calendar"],
 };

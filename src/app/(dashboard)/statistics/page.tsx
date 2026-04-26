@@ -1,17 +1,19 @@
 import { getUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { habits, completions } from "@/lib/db/schema";
-import { eq, gte, sql } from "drizzle-orm";
+import { eq, gte, and, inArray } from "drizzle-orm";
 import { format, subDays } from "date-fns";
-import { ru } from "date-fns/locale";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { WeeklyChart } from "@/components/charts/weekly-chart";
-import { HabitChart } from "@/components/charts/habit-chart";
-import { Flame, Trophy, TrendingUp, Target } from "lucide-react";
+import { StatisticsClient } from "@/components/statistics-client";
 import {
   calculateStreak,
   calculateBestStreak,
   getCompletionRate,
+  getWeeklyCompletionData,
+  getMonthlyCompletionData,
+  getHabitDistributionData,
+  getStreakHistory,
+  getActivityByDayOfWeek,
+  getInsights,
 } from "@/lib/streaks";
 
 export default async function StatisticsPage() {
@@ -24,16 +26,21 @@ export default async function StatisticsPage() {
     where: eq(habits.userId, user.id),
   });
 
+  const activeHabits = userHabits.filter((h) => !h.archivedAt);
+
   const allCompletions =
     userHabits.length > 0
       ? await db
           .select()
           .from(completions)
           .where(
-            sql`${completions.date} >= ${ninetyDaysAgo} AND ${completions.habitId} IN (${sql.join(
-              userHabits.map((h) => sql`${h.id}`),
-              sql`, `
-            )})`
+            and(
+              gte(completions.date, ninetyDaysAgo),
+              inArray(
+                completions.habitId,
+                userHabits.map((h) => h.id)
+              )
+            )
           )
           .orderBy(completions.date)
       : [];
@@ -50,152 +57,92 @@ export default async function StatisticsPage() {
     90
   );
 
-  const days = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-  const weeklyData = days.map((day, i) => {
-    const dayCompletions = allCompletions.filter((c) => {
-      const date = new Date(c.date + "T00:00:00");
-      return date.getDay() === ((i + 1) % 7) && c.completed;
-    });
-    const totalForDay = userHabits.length * Math.ceil(90 / 7);
-    return {
-      day,
-      completed: dayCompletions.length,
-      total: totalForDay,
-    };
-  });
-
-  // Get streaks per habit
-  const habitsWithStreaks = await Promise.all(
-    userHabits.map(async (habit) => {
-      const habitCompletions = allCompletions.filter(
-        (c) => c.habitId === habit.id
-      );
-      const streak = calculateStreak(
-        habitCompletions.map((c) => ({ date: c.date, completed: c.completed ?? false }))
-      );
-      return { ...habit, streak };
-    })
+  // Weekly activity data
+  const weeklyData = getActivityByDayOfWeek(
+    allCompletions.map((c) => ({ date: c.date, completed: c.completed ?? false })),
+    activeHabits.length
   );
 
-  const topStreaks = habitsWithStreaks
-    .filter((h) => h.streak > 0)
-    .sort((a, b) => b.streak - a.streak)
-    .slice(0, 5);
-
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-[1.5rem] font-semibold text-on-surface tracking-tight">
-          Статистика
-        </h1>
-        <p className="text-sm text-on-surface-variant">
-          Ваш прогресс за последние 90 дней
-        </p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={Target}
-          label="Выполнено"
-          value={String(totalCompleted)}
-          color="primary"
-        />
-        <StatCard
-          icon={Flame}
-          label="Текущая серия"
-          value={`${currentStreak} дн`}
-          color="tertiary"
-        />
-        <StatCard
-          icon={Trophy}
-          label="Лучшая серия"
-          value={`${bestStreak} дн`}
-          color="secondary"
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Успешность"
-          value={`${completionRate}%`}
-          color="primary"
-        />
-      </div>
-
-      {/* Weekly Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Активность по дням недели</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <WeeklyChart data={weeklyData} />
-        </CardContent>
-      </Card>
-
-      {/* Current Streaks */}
-      {topStreaks.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-on-surface">
-            Текущие серии
-          </h2>
-          <div className="space-y-3">
-            {topStreaks.map((habit) => (
-              <div
-                key={habit.id}
-                className="bg-surface-container-lowest rounded-2xl p-4 flex items-center gap-4"
-              >
-                <div
-                  className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center"
-                  style={{ backgroundColor: habit.color ?? "#0F53CD" }}
-                >
-                  <span className="text-lg">{habit.icon ?? "✨"}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-on-surface">{habit.name}</p>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Flame className="h-4 w-4 text-tertiary" />
-                  <span className="text-sm font-semibold text-tertiary">
-                    {habit.streak}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+  // Weekly completion rate (last 12 weeks)
+  const weeklyCompletionRate = getWeeklyCompletionData(
+    allCompletions.map((c) => ({ date: c.date, completed: c.completed ?? false })),
+    12
   );
-}
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-  color: "primary" | "secondary" | "tertiary";
-}) {
-  const colorClasses = {
-    primary: "bg-primary/10 text-primary",
-    secondary: "bg-secondary/10 text-secondary",
-    tertiary: "bg-tertiary/10 text-tertiary",
-  };
+  // Monthly completion rate (last 6 months)
+  const monthlyCompletionRate = getMonthlyCompletionData(
+    allCompletions.map((c) => ({ date: c.date, completed: c.completed ?? false })),
+    6
+  );
+
+  // Habit distribution
+  const habitDistribution = getHabitDistributionData(
+    activeHabits.map((h) => ({
+      id: h.id,
+      name: h.name,
+      color: h.color,
+    })),
+    allCompletions.map((c) => ({
+      habitId: c.habitId,
+      completed: c.completed,
+    }))
+  );
+
+  // Streak history
+  const streakHistory = getStreakHistory(
+    activeHabits.map((h) => ({
+      id: h.id,
+      name: h.name,
+      color: h.color,
+      icon: h.icon,
+    })),
+    allCompletions.map((c) => ({
+      habitId: c.habitId,
+      date: c.date,
+      completed: c.completed ?? false,
+    }))
+  ).filter((h) => h.current > 0 || h.best > 0);
+
+  // Top streaks
+  const topStreaks = streakHistory
+    .filter((h) => h.current > 0)
+    .sort((a, b) => b.current - a.current)
+    .slice(0, 5)
+    .map((h) => ({
+      id: h.id,
+      name: h.name,
+      color: h.color,
+      icon: h.icon,
+      streak: h.current,
+    }));
+
+  // Insights
+  const weeklyInsights = getInsights(
+    allCompletions.map((c) => ({ date: c.date, completed: c.completed ?? false })),
+    activeHabits.length,
+    7
+  );
+
+  const monthlyInsights = getInsights(
+    allCompletions.map((c) => ({ date: c.date, completed: c.completed ?? false })),
+    activeHabits.length,
+    30
+  );
 
   return (
-    <div className="bg-surface-container-lowest rounded-2xl p-4 space-y-3">
-      <div
-        className={`w-8 h-8 rounded-xl flex items-center justify-center ${colorClasses[color]}`}
-      >
-        <Icon className="h-4 w-4" />
-      </div>
-      <div>
-        <p className="text-2xl font-bold text-on-surface">{value}</p>
-        <p className="text-xs text-on-surface-variant">{label}</p>
-      </div>
-    </div>
+    <StatisticsClient
+      totalCompleted={totalCompleted}
+      currentStreak={currentStreak}
+      bestStreak={bestStreak}
+      completionRate={completionRate}
+      weeklyData={weeklyData}
+      weeklyCompletionRate={weeklyCompletionRate}
+      monthlyCompletionRate={monthlyCompletionRate}
+      habitDistribution={habitDistribution}
+      streakHistory={streakHistory}
+      topStreaks={topStreaks}
+      weeklyInsights={weeklyInsights}
+      monthlyInsights={monthlyInsights}
+    />
   );
 }
