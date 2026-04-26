@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1777207369129,
+      "tag": "0000_add_archive_and_custom_days",
+      "breakpoints": true
+    }
+  ]
+}
