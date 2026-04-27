@@ -40,8 +40,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# agents
+AGENTS.md
+
 # opencode
 .opencode/
+opencode/
 
 # temp files
 /tmp/
