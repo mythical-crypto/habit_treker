@@ -7,7 +7,7 @@ import { WeeklyChart } from "@/components/charts/weekly-chart";
 import { CompletionRateChart } from "@/components/charts/completion-rate-chart";
 import { HabitDistributionChart } from "@/components/charts/habit-distribution-chart";
 import { StreakHistoryChart } from "@/components/charts/streak-history-chart";
-import { Flame, Trophy, TrendingUp, Target, Calendar, Lightbulb } from "lucide-react";
+import { Flame, Trophy, Lightbulb } from "lucide-react";
 
 interface StatisticsClientProps {
   totalCompleted: number;
@@ -53,9 +53,6 @@ interface StatisticsClientProps {
 }
 
 export function StatisticsClient({
-  totalCompleted,
-  currentStreak,
-  bestStreak,
   completionRate,
   weeklyData,
   weeklyCompletionRate,
@@ -81,7 +78,7 @@ export function StatisticsClient({
             Статистика
           </h1>
           <p className="text-sm text-on-surface-variant">
-            Ваш прогресс и аналитика
+            Ваш прогресс и осознанность за последнее время
           </p>
         </div>
 
@@ -101,79 +98,122 @@ export function StatisticsClient({
         </Tabs>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={Target}
-          label="Выполнено"
-          value={String(totalCompleted)}
-          color="primary"
-        />
-        <StatCard
-          icon={Flame}
-          label="Текущая серия"
-          value={`${currentStreak} дн`}
-          color="tertiary"
-        />
-        <StatCard
-          icon={Trophy}
-          label="Лучшая серия"
-          value={`${bestStreak} дн`}
-          color="secondary"
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Успешность"
-          value={`${completionRate}%`}
-          color="primary"
-        />
+      {/* Progress & Streaks Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Общий прогресс */}
+        <div className="bg-surface-container-lowest rounded-2xl p-6">
+          <h3 className="text-sm font-medium text-on-surface-variant mb-4">
+            Общий прогресс
+          </h3>
+          <div className="flex items-center justify-center">
+            <div className="relative w-32 h-32">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <title>Общий прогресс: {completionRate}%</title>
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  className="text-surface-container-high"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  className="text-primary"
+                  strokeDasharray={`${completionRate * 2.64} ${264 - completionRate * 2.64}`}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl font-bold text-on-surface">
+                  {completionRate}%
+                </span>
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-on-surface-variant text-center mt-3">
+            выполнено за {period === "week" ? "неделю" : "месяц"}
+          </p>
+        </div>
+
+        {/* Текущие серии */}
+        <div className="bg-surface-container-lowest rounded-2xl p-6">
+          <h3 className="text-sm font-medium text-on-surface-variant mb-4">
+            Текущие серии
+          </h3>
+          <div className="space-y-4">
+            {topStreaks.length > 0 ? (
+              topStreaks.map((habit) => (
+                <div key={habit.id} className="flex items-center gap-3">
+                  <div
+                    className="w-9 h-9 rounded-xl flex items-center justify-center bg-surface-container"
+                    style={
+                      habit.color
+                        ? { backgroundColor: habit.color + "20" }
+                        : undefined
+                    }
+                  >
+                    <span className="text-base">{habit.icon ?? "✨"}</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-on-surface">
+                      {habit.name}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-semibold text-on-surface">
+                      {habit.streak} дней
+                    </span>
+                    {habit.streak > 0 && (
+                      <Flame className="h-4 w-4 text-tertiary" />
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-on-surface-variant text-center py-4">
+                Нет активных серий
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Insight Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="bg-surface-container-lowest border-0">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Calendar className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-on-surface">
-                  {period === "week" ? "За неделю" : "За месяц"}
-                </p>
-                <p className="text-2xl font-bold text-on-surface mt-1">
-                  {insights.rate}%
-                </p>
-                <p className="text-xs text-on-surface-variant mt-0.5">
-                  {insights.completed} из {insights.total} выполнено
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-surface-container-low rounded-2xl p-5 flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <Lightbulb className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-on-surface">Инсайт недели</p>
+            <p className="text-sm text-on-surface-variant mt-1">
+              {insights.trend === "positive"
+                ? "Отличная динамика! Вы на верном пути к своим целям."
+                : "Есть потенциал для роста. Попробуйте изменить расписание."}
+            </p>
+          </div>
+        </div>
 
-        <Card className="bg-surface-container-lowest border-0">
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-secondary/10 flex items-center justify-center shrink-0">
-                <Lightbulb className="h-4 w-4 text-secondary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-on-surface">
-                  Лучший день
-                </p>
-                <p className="text-lg font-bold text-on-surface mt-1">
-                  {insights.bestDay}
-                </p>
-                <p className="text-xs text-on-surface-variant mt-0.5">
-                  {insights.trend === "positive"
-                    ? "Отличная динамика!"
-                    : "Есть куда расти"}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-surface-container-low rounded-2xl p-5 flex items-start gap-3">
+          <div className="w-9 h-9 rounded-xl bg-tertiary/10 flex items-center justify-center shrink-0">
+            <Trophy className="h-4 w-4 text-tertiary" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-on-surface">До цели</p>
+            <p className="text-sm text-on-surface-variant mt-1">
+              {topStreaks.length > 0
+                ? `Осталось совсем немного до нового рекорда по серии "${topStreaks[0].name}"!`
+                : "Создайте привычки и начните отслеживать прогресс!"}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Charts Grid */}
@@ -181,15 +221,10 @@ export function StatisticsClient({
         {/* Completion Rate Chart */}
         <Card className="bg-surface-container-lowest border-0">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">
-              Динамика выполнения
-            </CardTitle>
+            <CardTitle className="text-base">Динамика выполнения</CardTitle>
           </CardHeader>
           <CardContent>
-            <CompletionRateChart
-              data={completionRateData}
-              color="#3b82f6"
-            />
+            <CompletionRateChart data={completionRateData} color="#3b82f6" />
           </CardContent>
         </Card>
 
@@ -208,9 +243,12 @@ export function StatisticsClient({
         {/* Weekly Activity */}
         <Card className="bg-surface-container-lowest border-0">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">
-              Активность по дням недели
-            </CardTitle>
+            <CardTitle className="text-base">Активность по дням</CardTitle>
+            {weeklyData.length > 0 && (
+              <p className="text-xs text-on-surface-variant">
+                {weeklyData[0]?.day} — {weeklyData[weeklyData.length - 1]?.day}
+              </p>
+            )}
           </CardHeader>
           <CardContent>
             <WeeklyChart data={weeklyData} />
@@ -220,79 +258,12 @@ export function StatisticsClient({
         {/* Streak History */}
         <Card className="bg-surface-container-lowest border-0">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">
-              История серий
-            </CardTitle>
+            <CardTitle className="text-base">История серий</CardTitle>
           </CardHeader>
           <CardContent>
             <StreakHistoryChart data={streakHistory} />
           </CardContent>
         </Card>
-      </div>
-
-      {/* Current Streaks */}
-      {topStreaks.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-on-surface">
-            Текущие серии
-          </h2>
-          <div className="space-y-3">
-            {topStreaks.map((habit) => (
-              <div
-                key={habit.id}
-                className="bg-surface-container-lowest rounded-2xl p-4 flex items-center gap-4"
-              >
-                <div
-                  className="w-10 h-10 rounded-full shrink-0 flex items-center justify-center"
-                  style={{ backgroundColor: habit.color ?? "#0F53CD" }}
-                >
-                  <span className="text-lg">{habit.icon ?? "✨"}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-on-surface">{habit.name}</p>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Flame className="h-4 w-4 text-tertiary" />
-                  <span className="text-sm font-semibold text-tertiary">
-                    {habit.streak}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  color,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-  color: "primary" | "secondary" | "tertiary";
-}) {
-  const colorClasses = {
-    primary: "bg-primary/10 text-primary",
-    secondary: "bg-secondary/10 text-secondary",
-    tertiary: "bg-tertiary/10 text-tertiary",
-  };
-
-  return (
-    <div className="bg-surface-container-lowest rounded-2xl p-4 space-y-3">
-      <div
-        className={`w-8 h-8 rounded-xl flex items-center justify-center ${colorClasses[color]}`}
-      >
-        <Icon className="h-4 w-4" />
-      </div>
-      <div>
-        <p className="text-2xl font-bold text-on-surface">{value}</p>
-        <p className="text-xs text-on-surface-variant">{label}</p>
       </div>
     </div>
   );

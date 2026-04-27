@@ -87,14 +87,9 @@ export default async function CalendarPage({
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[1.5rem] font-semibold text-on-surface tracking-tight">
-            Календарь
-          </h1>
-          <p className="text-sm text-on-surface-variant mt-0.5 capitalize">
-            {format(currentDate, "MMMM yyyy", { locale: ru })}
-          </p>
-        </div>
+        <h1 className="text-[1.5rem] font-semibold text-on-surface tracking-tight">
+          Календарь — {format(currentDate, "LLLL yyyy", { locale: ru })}
+        </h1>
         <div className="flex items-center gap-2">
           <Link
             href={`/calendar?month=${prevMonth}`}
@@ -133,39 +128,37 @@ export default async function CalendarPage({
           ))}
 
           {dayStats.map(({ date, completed, total }) => {
-            const isCurrentMonth = isSameMonth(date, currentDate);
             const isTodayDate = isToday(date);
-            const progress = total > 0 ? completed / total : 0;
+            const isCurrentMonth = isSameMonth(date, currentDate);
+            const hasCompletion = completed > 0;
 
             return (
               <div
                 key={date.toISOString()}
-                className={`aspect-square rounded-xl p-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
+                className={`aspect-auto min-h-[80px] rounded-xl p-2 flex flex-col items-center gap-0.5 transition-colors ${
                   isTodayDate
                     ? "bg-primary/10"
                     : "hover:bg-surface-container"
                 }`}
               >
-                <span
-                  className={`text-sm font-medium ${
-                    isTodayDate
-                      ? "text-primary"
-                      : isCurrentMonth
+                <span className={`text-sm font-medium ${
+                  isTodayDate
+                    ? "text-primary"
+                    : isCurrentMonth
                       ? "text-on-surface"
                       : "text-on-surface-variant/40"
-                  }`}
-                >
+                }`}>
                   {format(date, "d")}
                 </span>
-                {total > 0 && (
-                  <div className="flex gap-0.5">
-                    {progress >= 1 && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
-                    )}
-                    {progress > 0 && progress < 1 && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                    )}
-                  </div>
+                {hasCompletion && total > 0 && (
+                  <span className="text-[10px] text-on-surface-variant/60 text-center leading-tight">
+                    Выполнено {completed} из {total}
+                  </span>
+                )}
+                {total > 0 && !hasCompletion && (
+                  <span className="text-[10px] text-on-surface-variant/30 text-center">
+                    —
+                  </span>
                 )}
               </div>
             );
@@ -177,26 +170,43 @@ export default async function CalendarPage({
       <div className="flex items-center gap-6 text-sm">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-secondary" />
-          <span className="text-on-surface-variant">Выполнено</span>
+          <span className="text-on-surface-variant">выполнено</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-primary/40" />
-          <span className="text-on-surface-variant">Частично</span>
+          <div className="w-3 h-3 rounded-full bg-surface-container-high" />
+          <span className="text-on-surface-variant">не выполнено</span>
         </div>
       </div>
 
       {/* Footer Stats */}
-      <div className="bg-surface-container-low rounded-2xl p-5 flex items-center justify-between">
-        <div>
-          <p className="text-sm text-on-surface-variant">Прогресс месяца</p>
-          <p className="text-2xl font-bold text-on-surface">{monthlyProgress}%</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Flame className="h-5 w-5 text-tertiary" />
-          <div className="text-right">
-            <p className="text-sm text-on-surface-variant">Текущая серия</p>
-            <p className="text-2xl font-bold text-tertiary">{currentStreak} дн</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Progress */}
+        <div className="bg-surface-container-low rounded-2xl p-5">
+          <p className="text-sm text-on-surface-variant mb-1">Прогресс месяца</p>
+          <p className="text-3xl font-bold text-on-surface">{monthlyProgress}%</p>
+          {/* Progress bar */}
+          <div className="mt-3 h-2 bg-surface-container-high rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-500"
+              style={{ width: `${monthlyProgress}%` }}
+            />
           </div>
+          <p className="text-xs text-on-surface-variant/60 mt-2">
+            {monthlyProgress >= 70 ? "Отличный темп!" : "Продолжайте в том же духе!"}
+          </p>
+        </div>
+
+        {/* Current Streak */}
+        <div className="bg-surface-container-low rounded-2xl p-5">
+          <p className="text-sm text-on-surface-variant mb-1">Текущая серия</p>
+          <div className="flex items-center gap-2">
+            <Flame className="h-6 w-6 text-tertiary" />
+            <span className="text-3xl font-bold text-tertiary">{currentStreak}</span>
+            <span className="text-sm text-on-surface-variant">дней</span>
+          </div>
+          <p className="text-xs text-on-surface-variant/60 mt-2">
+            Новый рекорд близок
+          </p>
         </div>
       </div>
     </div>

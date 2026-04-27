@@ -58,7 +58,8 @@ export async function createHabit(formData: FormData) {
   });
 
   revalidatePath("/");
-  redirect("/habits");
+  revalidatePath("/habits");
+  return { success: true };
 }
 
 export async function updateHabit(id: number, formData: FormData) {

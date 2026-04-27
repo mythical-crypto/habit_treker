@@ -1,214 +1,214 @@
-# Implementation Plan: Habit Tracker (Трекер Привычек)
+# План Реализации: Трекер Привычек
 
-**Project:** Трекер Привычек (The Mindful Ritual)  
-**Design Source:** [Stitch](https://stitch.withgoogle.com/projects/6270119330405921257) — "Ethos Minimalist" design system  
-**Stack:** Next.js 16 + React 19 + TypeScript + Drizzle ORM + PostgreSQL + Better Auth + Recharts + shadcn/ui  
-**Target:** localhost:3000
-
----
-
-## Phase 0: Foundation ✅
-
-- [x] Initialize Next.js 16 project with App Router
-- [x] Configure Tailwind CSS v4
-- [x] Set up shadcn/ui
-- [x] Configure Drizzle ORM + PostgreSQL
-- [x] Set up Better Auth (email/password)
-- [x] Create middleware for route protection
-- [x] Create base database schema (users, sessions, habits, completions)
-
-**Verification:** `npm run dev` starts without errors on localhost:3000
+**Проект:** Трекер Привычек (The Mindful Ritual)  
+**Источник дизайна:** [Stitch](https://stitch.withgoogle.com/projects/6270119330405921257) — дизайн-система "Ethos Minimalist"  
+**Стек:** Next.js 16 + React 19 + TypeScript + Drizzle ORM + PostgreSQL + Better Auth + Recharts + shadcn/ui  
+**Целевой адрес:** localhost:3000
 
 ---
 
-## Phase 1: Authentication & Layout ✅
+## Фаза 0: Фундамент ✅
 
-- [x] Login page (`/login`)
-- [x] Registration page (`/register`)
-- [x] Dashboard layout with sidebar
-- [x] Sidebar navigation (Привычки, Календарь, Статистика)
-- [x] Logout functionality
-- [x] Middleware route protection
+- [x] Инициализация проекта Next.js 16 с App Router
+- [x] Настройка Tailwind CSS v4
+- [x] Установка shadcn/ui
+- [x] Настройка Drizzle ORM + PostgreSQL
+- [x] Настройка Better Auth (email/password)
+- [x] Создание middleware для защиты маршрутов
+- [x] Создание базовой схемы базы данных (users, sessions, habits, completions)
 
-**Verification:**
-- [x] Can register new account
-- [x] Can log in with existing account
-- [x] Unauthenticated users redirected to `/login`
-- [x] Authenticated users redirected from `/login` to `/`
+**Проверка:** `npm run dev` запускается без ошибок на localhost:3000
 
 ---
 
-## Phase 2: Core Habit Management ✅
+## Фаза 1: Аутентификация и Макет ✅
 
-### 2.1 Habit CRUD
-- [x] Create habit form — name, icon, frequency (daily/weekly/custom days), color, targetPerWeek
-- [x] Edit habit with all fields
-- [x] Delete habit with confirmation (Russian text)
-- [x] Archive habit (soft delete) + restore functionality
+- [x] Страница входа (`/login`)
+- [x] Страница регистрации (`/register`)
+- [x] Макет дашборда с боковой панелью
+- [x] Навигация в боковой панели (Привычки, Календарь, Статистика)
+- [x] Функционал выхода из системы
+- [x] Защита маршрутов через middleware
 
-### 2.2 Habit Tracking
-- [x] Mark habit as complete/incomplete for today
-- [x] Visual completion indicator (check/circle with color transition)
-- [x] Streak counter display (Flame icon + count)
-- [x] Daily progress summary ("Выполнено X из Y")
-
-### 2.3 Dashboard Enhancement
-- [x] Habit cards with icons and streaks
-- [x] "Мудрость дня" (daily quote) section
-- [x] Quick-add habit button (FAB)
-
-**Database Changes Done:**
-- [x] Add `archived_at` to habits table
-- [x] Add `custom_days` array to habits (for custom frequency)
-- [x] `icon` field already existed
-- [x] `target_per_week` already existed
-
-**Verification:**
-- [x] Can create habit with all fields (including custom days)
-- [x] Can edit habit with all fields
-- [x] Can archive/restore habit
-- [x] Can delete habit with confirmation
-- [x] Can mark habit complete/incomplete
-- [x] Streak updates correctly
-- [x] Dashboard shows all active habits with correct status
-- [x] Build passes (`npm run build`)
-- [x] Lint clean (0 errors)
+**Проверка:**
+- [x] Можно зарегистрировать новый аккаунт
+- [x] Можно войти с существующим аккаунтом
+- [x] Неаутентифицированные пользователи перенаправляются на `/login`
+- [x] Аутентифицированные пользователи перенаправляются с `/login` на `/`
 
 ---
 
-## Phase 3: Statistics & Analytics ✅
+## Фаза 2: Основное Управление Привычками ✅
 
-### 3.1 Statistics Page (`/statistics`)
-- [x] Weekly/Monthly toggle
-- [x] Overall completion percentage
-- [x] Current streaks list by habit
-- [x] Activity heatmap (by days of week)
-- [x] Weekly insight cards
+### 2.1 CRUD для привычек
+- [x] Форма создания привычки — название, иконка, частота (daily/weekly/custom days), цвет, targetPerWeek
+- [x] Редактирование привычки со всеми полями
+- [x] Удаление привычки с подтверждением (русский текст)
+- [x] Архивирование привычки (мягкое удаление) + функция восстановления
 
-### 3.2 Charts
-- [x] Completion rate line chart (Recharts)
-- [x] Habit distribution pie chart
-- [x] Weekly activity bar chart
-- [x] Streak history visualization
+### 2.2 Отслеживание привычек
+- [x] Отметить привычку как выполненную/невыполненную на сегодня
+- [x] Визуальный индикатор выполнения (галочка/круг с цветовым переходом)
+- [x] Отображение счётчика серии (Flame icon + count)
+- [x] Ежедневная сводка прогресса ("Выполнено X из Y")
 
-### 3.3 Data Aggregation
-- [x] Completion rate calculation (SQL)
-- [x] Streak calculation (SQL gaps-and-islands)
-- [x] Weekly/monthly aggregation functions
+### 2.3 Улучшение дашборда
+- [x] Карточки привычек с иконками и сериями
+- [x] Раздел "Мудрость дня" (daily quote)
+- [x] Кнопка быстрого добавления привычки (FAB)
 
-**Verification:**
-- [x] Statistics page loads with real data
-- [x] Charts render correctly
-- [x] Toggle between week/month updates data
+**Выполненные изменения базы данных:**
+- [x] Добавлено поле `archived_at` в таблицу habits
+- [x] Добавлен массив `custom_days` в таблицу habits (для пользовательской частоты)
+- [x] Поле `icon` уже существовало
+- [x] Поле `target_per_week` уже существовало
 
----
-
-## Phase 4: Calendar View
-
-### 4.1 Calendar Page (`/calendar`)
-- [x] Monthly calendar grid
-- [x] Navigation (prev/next month)
-- [x] Day cells show completion count ("Выполнено X из Y")
-- [x] Visual indicators for completed/partial/missed days
-
-### 4.2 Day Detail
-- [ ] Click day to see habit details
-- [ ] Show which habits were completed
-- [ ] Allow retroactive completion
-
-**Verification:**
-- [x] Calendar shows correct month
-- [x] Days show accurate completion data
-- [x] Navigation works correctly
+**Проверка:**
+- [x] Можно создать привычку со всеми полями (включая custom days)
+- [x] Можно редактировать привычку со всеми полями
+- [x] Можно архивировать/восстанавливать привычку
+- [x] Можно удалить привычку с подтверждением
+- [x] Можно отметить привычку как выполненную/невыполненную
+- [x] Серия обновляется корректно
+- [x] Дашборд показывает все активные привычки с правильным статусом
+- [x] Сборка проходит (`npm run build`)
+- [x] Линт чистый (0 ошибок)
 
 ---
 
-## Phase 5: Design System Implementation
+## Фаза 3: Статистика и Аналитика ✅
 
-### 5.1 Design Tokens
-- [x] Create `globals.css` with all Stitch colors (mapped to CSS vars + Tailwind)
-- [x] Map tokens to Tailwind config (via `@theme inline`)
-- [x] Typography scale (Inter font via `next/font`)
+### 3.1 Страница статистики (`/statistics`)
+- [x] Переключатель Неделя/Месяц
+- [x] Общий процент выполнения
+- [x] Список текущих серий по привычкам
+- [x] Тепловая карта активности (по дням недели)
+- [x] Карточки с инсайтами за неделю
 
-### 5.2 Component Styling
-- [x] Sidebar (surface-container-low, navigation with icons)
-- [x] Habit cards (no borders, tonal layering with surface-container-lowest)
-- [x] Buttons (primary gradient via shadcn/ui + Tailwind)
-- [x] Inputs (surface-container-highest via shadcn/ui)
-- [x] Modal (glass effect via Dialog component)
+### 3.2 Графики
+- [x] Линейный график процента выполнения (Recharts)
+- [x] Круговая диаграмма распределения привычек
+- [x] Столбчатый график недельной активности
+- [x] Визуализация истории серий
 
-### 5.3 Layout
-- [x] Main canvas (max-width 960px, centered)
-- [x] Sidebar + main content layout (flex)
-- [x] Corner radius (rounded-2xl for cards, rounded-xl for buttons)
+### 3.3 Агрегация данных
+- [x] Расчёт процента выполнения (SQL)
+- [x] Расчёт серий (SQL gaps-and-islands)
+- [x] Функции агрегации по неделям/месяцам
 
-### 5.4 Russian Localization
-- [x] All UI text in Russian
-- [x] Date formatting (ru locale via date-fns)
-- [x] Proper text expansion for buttons
-
-**Verification:**
-- [x] No hardcoded colors (all via CSS variables / Tailwind tokens)
-- [x] No 1px borders (tonal layering)
-- [x] Proper Russian text throughout
+**Проверка:**
+- [x] Страница статистики загружается с реальными данными
+- [x] Графики отображаются корректно
+- [x] Переключение неделя/месяц обновляет данные
 
 ---
 
-## Phase 6: Polish & Performance
+## Фаза 4: Календарь
 
-### 6.1 Animations
-- [ ] Habit completion animation
-- [ ] Streak counter animation
-- [ ] Page transitions
-- [ ] Modal open/close animation
+### 4.1 Страница календаря (`/calendar`)
+- [x] Сетка календаря на месяц
+- [x] Навигация (предыдущий/следующий месяц)
+- [x] Ячейки дней показывают количество выполнений ("Выполнено X из Y")
+- [x] Визуальные индикаторы для выполненных/частичных/пропущенных дней
 
-### 6.2 Optimizations
-- [x] Server Components for data fetching
-- [ ] Optimistic updates for habit completion
-- [ ] Image optimization
-- [x] Font optimization (Inter from Google Fonts via next/font)
+### 4.2 Детали дня
+- [ ] Клик по дню для просмотра деталей привычек
+- [ ] Показать, какие привычки были выполнены
+- [ ] Возможность ретроактивного отмечания выполнения
 
-### 6.3 Error Handling
-- [ ] Error boundaries
-- [ ] Loading states (skeletons)
-- [ ] Empty states
-- [x] Toast notifications (Sonner)
+**Проверка:**
+- [x] Календарь показывает правильный месяц
+- [x] Дни отображают точные данные о выполнении
+- [x] Навигация работает корректно
 
-**Verification:**
+---
+
+## Фаза 5: Внедрение Дизайн-Системы
+
+### 5.1 Дизайн-токены
+- [x] Создан `globals.css` со всеми цветами Stitch (привязаны к CSS-переменным + Tailwind)
+- [x] Привязка токенов к конфигурации Tailwind (через `@theme inline`)
+- [x] Типографическая шкала (шрифт Inter через `next/font`)
+
+### 5.2 Стилизация компонентов
+- [x] Боковая панель (surface-container-low, навигация с иконками)
+- [x] Карточки привычек (без рамок, тональное наслоение с surface-container-lowest)
+- [x] Кнопки (primary gradient через shadcn/ui + Tailwind)
+- [x] Поля ввода (surface-container-highest через shadcn/ui)
+- [x] Модальное окно (glass-эффект через компонент Dialog)
+
+### 5.3 Макет
+- [x] Основная область (max-width 960px, по центру)
+- [x] Макет «боковая панель + основной контент» (flex)
+- [x] Скругление углов (rounded-2xl для карточек, rounded-xl для кнопок)
+
+### 5.4 Русская локализация
+- [x] Весь UI текст на русском языке
+- [x] Форматирование дат (ru locale через date-fns)
+- [x] Корректное расширение текста для кнопок
+
+**Проверка:**
+- [x] Нет захардкоженных цветов (всё через CSS-переменные / Tailwind-токены)
+- [x] Нет рамок 1px (тональное наслоение)
+- [x] Корректный русский текст повсюду
+
+---
+
+## Фаза 6: Полировка и Производительность
+
+### 6.1 Анимации
+- [ ] Анимация выполнения привычки
+- [ ] Анимация счётчика серий
+- [ ] Переходы между страницами
+- [ ] Анимация открытия/закрытия модального окна
+
+### 6.2 Оптимизации
+- [x] Server Components для получения данных
+- [ ] Оптимистичные обновления для отметки выполнения привычки
+- [ ] Оптимизация изображений
+- [x] Оптимизация шрифтов (Inter из Google Fonts через next/font)
+
+### 6.3 Обработка ошибок
+- [ ] Границы ошибок (Error Boundaries)
+- [ ] Состояния загрузки (скелетоны)
+- [ ] Пустые состояния
+- [x] Тост-уведомления (Sonner)
+
+**Проверка:**
 - [ ] Lighthouse score > 90
-- [ ] Smooth animations at 60fps
-- [ ] No layout shift
+- [ ] Плавные анимации при 60fps
+- [ ] Отсутствие сдвигов макета
 
 ---
 
-## Phase 7: Testing & Deployment Prep
+## Фаза 7: Тестирование и Подготовка к Деплою
 
-### 7.1 Testing
-- [ ] Unit tests for streak calculation
-- [ ] Unit tests for habit CRUD actions
-- [ ] Integration tests for auth flow
-- [ ] E2E tests for critical paths
+### 7.1 Тестирование
+- [ ] Модульные тесты для расчёта серий
+- [ ] Модульные тесты для CRUD-операций с привычками
+- [ ] Интеграционные тесты для потока аутентификации
+- [ ] E2E-тесты для критических сценариев
 
-### 7.2 Documentation
-- [x] README with setup instructions
-- [x] Environment variable documentation
-- [x] Database setup guide (drizzle-kit migrate)
+### 7.2 Документация
+- [x] README с инструкциями по установке
+- [x] Документация переменных окружения
+- [x] Руководство по настройке базы данных (drizzle-kit migrate)
 
-### 7.3 Production Readiness
-- [ ] Environment validation
-- [ ] Error monitoring setup
-- [ ] Performance monitoring
+### 7.3 Готовность к продакшену
+- [ ] Валидация окружения
+- [ ] Настройка мониторинга ошибок
+- [ ] Мониторинг производительности
 
-**Verification:**
-- [ ] All tests pass
-- [ ] App runs on clean environment
-- [ ] No console errors
+**Проверка:**
+- [ ] Все тесты проходят
+- [ ] Приложение запускается в чистом окружении
+- [ ] Нет ошибок в консоли
 
 ---
 
-## Database Schema Evolution
+## Эволюция Схемы Базы Данных
 
-### Current Schema
+### Текущая схема
 ```
 users (id, email, name, emailVerified, image, createdAt, updatedAt)
 sessions (id, expiresAt, token, ipAddress, userAgent, userId)
@@ -216,18 +216,18 @@ habits (id, userId, name, description, frequency, color, icon, targetPerWeek, ar
 completions (id, habitId, date, completed, notes, createdAt)
 ```
 
-### Phase 2 Additions
+### Добавления Фазы 2
 - `habits.archived_at` (timestamp, nullable)
-- `habits.custom_days` (integer[], for custom frequency)
+- `habits.custom_days` (integer[], для пользовательской частоты)
 - `habits.target_count` (integer, default 1)
 
-### Phase 3 Additions
-- Streak calculation done in TypeScript (`src/lib/streaks.ts`) — no separate `streaks` table needed
-- Indexes for performance
+### Добавления Фазы 3
+- Расчёт серий выполнен на TypeScript (`src/lib/streaks.ts`) — отдельная таблица `streaks` не требуется
+- Индексы для производительности
 
 ---
 
-## File Structure (Current)
+## Структура Файлов (Текущая)
 
 ```
 src/
@@ -261,7 +261,7 @@ src/
 │   │   ├── streak-history-chart.tsx
 │   │   ├── weekly-chart.tsx
 │   │   └── habit-chart.tsx
-│   ├── ui/                    # shadcn/ui components
+│   ├── ui/                    # shadcn/ui компоненты
 │   ├── sidebar.tsx
 │   ├── habit-form.tsx
 │   └── statistics-client.tsx
@@ -283,16 +283,16 @@ src/
 
 ---
 
-## Next Steps
+## Следующие Шаги
 
-1. ~~**Immediate:** Complete Phase 2 (Habit CRUD + tracking)~~ ✅ DONE
-2. ~~**This week:** Phase 3 (Statistics) + Phase 4 (Calendar)~~ ✅ Phase 3 done, Phase 4 mostly done
-3. **Current:** Phase 4.2 (Day detail in calendar) + Phase 6 (Animations)
-4. **Final:** Phase 6 (Performance) + Phase 7 (Testing)
+1. ~~**Немедленно:** Завершить Фазу 2 (CRUD привычек + отслеживание)~~ ✅ ГОТОВО
+2. ~~**На этой неделе:** Фаза 3 (Статистика) + Фаза 4 (Календарь)~~ ✅ Фаза 3 готова, Фаза 4 почти готова
+3. **Текущий этап:** Фаза 4.2 (Детали дня в календаре) + Фаза 6 (Анимации)
+4. **Финал:** Фаза 6 (Производительность) + Фаза 7 (Тестирование)
 
-**Success Criteria:**
-- [x] Functional habit tracking with streaks
-- [x] Working statistics and calendar
-- [x] Design system tokens implemented
-- [ ] All 5 Stitch screens pixel-perfect
-- [ ] Runs on localhost:3000 with single `npm run dev`
+**Критерии успеха:**
+- [x] Работающее отслеживание привычек с сериями
+- [x] Работающая статистика и календарь
+- [x] Внедрены токены дизайн-системы
+- [ ] Все 5 экранов Stitch pixel-perfect
+- [ ] Запуск на localhost:3000 одной командой `npm run dev`

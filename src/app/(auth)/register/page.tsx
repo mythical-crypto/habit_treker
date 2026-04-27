@@ -87,7 +87,7 @@ export default function RegisterPage() {
 
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-on-surface">
-              Email
+              Электронная почта
             </Label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant/50" />
@@ -167,6 +167,13 @@ export default function RegisterPage() {
       <p className="text-center text-xs text-on-surface-variant/60 italic">
         «Каждый день — новая возможность стать лучше.»
       </p>
+
+      {/* Footer links */}
+      <div className="flex justify-center gap-4 text-xs text-on-surface-variant/40 mt-4">
+        <a href="#">Политика</a>
+        <span>·</span>
+        <a href="#">Поддержка</a>
+      </div>
     </div>
   );
 }

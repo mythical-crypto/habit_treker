@@ -6,7 +6,6 @@ import { authClient, useSession } from "@/lib/auth-client";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   LayoutDashboard,
-  ListChecks,
   BarChart3,
   CalendarDays,
   LogOut,
@@ -16,9 +15,8 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Привычки", icon: LayoutDashboard },
-  { href: "/habits", label: "Мои привычки", icon: ListChecks },
-  { href: "/statistics", label: "Статистика", icon: BarChart3 },
   { href: "/calendar", label: "Календарь", icon: CalendarDays },
+  { href: "/statistics", label: "Статистика", icon: BarChart3 },
 ];
 
 export function Sidebar() {
@@ -104,7 +102,7 @@ export function Sidebar() {
                 {user?.name ?? "Пользователь"}
               </p>
               <p className="text-xs text-on-surface-variant truncate">
-                {user?.email ?? ""}
+                Premium Plan
               </p>
             </div>
           </div>

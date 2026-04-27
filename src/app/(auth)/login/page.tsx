@@ -7,7 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Mail, Lock } from "lucide-react";
+import { Sparkles, Mail, Lock, ArrowRight } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -55,7 +55,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-on-surface">
-              Email
+              Электронная почта
             </Label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant/50" />
@@ -72,9 +72,14 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium text-on-surface">
-              Пароль
-            </Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="password" className="text-sm font-medium text-on-surface">
+                Пароль
+              </Label>
+              <Link href="#" className="text-xs text-primary hover:underline">
+                Забыли?
+              </Link>
+            </div>
             <div className="relative">
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant/50" />
               <Input
@@ -96,7 +101,7 @@ export default function LoginPage() {
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Вход..." : "Войти"}
+            {loading ? "Вход..." : "Войти"} <ArrowRight className="h-4 w-4" />
           </Button>
         </form>
 
@@ -113,8 +118,15 @@ export default function LoginPage() {
 
       {/* Quote */}
       <p className="text-center text-xs text-on-surface-variant/60 italic">
-        «Маленькие шаги каждый день ведут к большим достижениям.»
+        «Маленькие шаги ведут к большим переменам.»
       </p>
+
+      {/* Footer links */}
+      <div className="flex justify-center gap-4 text-xs text-on-surface-variant/40 mt-4">
+        <a href="#">Политика</a>
+        <span>·</span>
+        <a href="#">Поддержка</a>
+      </div>
     </div>
   );
 }

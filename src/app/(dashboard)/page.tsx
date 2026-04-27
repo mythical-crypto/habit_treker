@@ -4,16 +4,17 @@ import { habits, completions } from "@/lib/db/schema";
 import { eq, and, inArray } from "drizzle-orm";
 import { format } from "date-fns";
 import Link from "next/link";
-import { Flame, Plus, Quote } from "lucide-react";
+import { Flame, Plus, Quote, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { calculateStreak } from "@/lib/streaks";
+import { CreateHabitDialog } from "@/components/create-habit-dialog";
 
 const quotes = [
+  "Мы — это то, что мы делаем постоянно. Совершенство, следовательно, не действие, а привычка.",
   "Маленькие шаги каждый день ведут к большим достижениям.",
   "Привычка — вторая натура.",
   "Лучшее время начать — сейчас.",
   "Постоянство — ключ к мастерству.",
-  "Каждый день — новая возможность стать лучше.",
 ];
 
 export default async function DashboardPage() {
@@ -115,11 +116,25 @@ export default async function DashboardPage() {
                       <div className="flex items-center gap-1">
                         <Flame className="h-3.5 w-3.5 text-tertiary" />
                         <span className="text-xs font-medium text-tertiary">
-                          {habit.streak}
+                          {habit.streak} дней
                         </span>
                       </div>
                     )}
                   </div>
+                </div>
+
+                {/* Actions - edit and delete */}
+                <div className="flex items-center gap-1">
+                  <Link href={`/habits/${habit.id}`}>
+                    <button type="button" className="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant/40 hover:text-on-surface-variant hover:bg-surface-container transition-colors">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                  </Link>
+                  <form action={async () => { "use server"; const { deleteHabit } = await import("@/app/actions/habits"); await deleteHabit(habit.id); }}>
+                    <button type="submit" className="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant/40 hover:text-error hover:bg-error-container/50 transition-colors">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </form>
                 </div>
 
                 {/* Completion Toggle */}
@@ -166,29 +181,18 @@ export default async function DashboardPage() {
       </div>
 
       {/* FAB */}
-      {userHabits.length > 0 && (
-        <div className="fixed bottom-8 right-8">
-          <Link href="/habits/new">
-            <Button
-              size="icon-lg"
-              className="shadow-[0_12px_32px_-4px_rgba(25,28,29,0.06)] rounded-2xl"
-            >
-              <Plus className="h-6 w-6" />
-            </Button>
-          </Link>
-        </div>
-      )}
+      {userHabits.length > 0 && <CreateHabitDialog />}
 
       {/* Quote Card */}
       <div className="bg-surface-container-low rounded-2xl p-6">
         <div className="flex items-start gap-3">
           <Quote className="h-5 w-5 text-primary shrink-0 mt-0.5" />
           <div>
+            <p className="text-xs font-medium text-on-surface-variant uppercase tracking-wider mb-2">
+              Мудрость дня
+            </p>
             <p className="text-sm text-on-surface-variant italic leading-relaxed">
               {todayQuote}
-            </p>
-            <p className="text-xs text-on-surface-variant/60 mt-2">
-              Мудрость дня
             </p>
           </div>
         </div>

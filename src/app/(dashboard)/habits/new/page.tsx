@@ -1,7 +1,19 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { createHabit } from "@/app/actions/habits";
 import { HabitForm } from "@/components/habit-form";
 
 export default function NewHabitPage() {
+  const router = useRouter();
+
+  async function handleCreateHabit(formData: FormData) {
+    const result = await createHabit(formData);
+    if (result?.success) {
+      router.push("/habits");
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -13,7 +25,7 @@ export default function NewHabitPage() {
         </p>
       </div>
 
-      <HabitForm action={createHabit} submitLabel="Создать привычку" />
+      <HabitForm action={handleCreateHabit} submitLabel="Создать привычку" />
     </div>
   );
 }
