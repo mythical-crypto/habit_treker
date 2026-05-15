@@ -1,43 +1,18 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { authClient } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Mail, Lock, ArrowRight } from "lucide-react";
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+interface LoginPageProps {
+  searchParams?: Promise<{ error?: string }>;
+}
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    const { error: signInError } = await authClient.signIn.email({
-      email,
-      password,
-    });
-
-    if (signInError) {
-      setError(signInError.message ?? "Неверный email или пароль");
-      setLoading(false);
-      return;
-    }
-
-    router.push("/");
-  }
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
+  const hasError = params?.error === "1";
 
   return (
     <div className="space-y-8">
-      {/* Logo */}
       <div className="text-center space-y-3">
         <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center mx-auto">
           <Sparkles className="h-6 w-6 text-on-primary" />
@@ -50,9 +25,8 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Form */}
       <div className="bg-surface-container-lowest rounded-2xl p-6 space-y-5">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action="/api/demo-login" method="post" className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-on-surface">
               Электронная почта
@@ -61,10 +35,10 @@ export default function LoginPage() {
               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant/50" />
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                defaultValue="admin@example.com"
                 required
                 className="pl-10"
               />
@@ -84,25 +58,28 @@ export default function LoginPage() {
               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant/50" />
               <Input
                 id="password"
+                name="password"
                 type="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                defaultValue="admin"
                 required
                 className="pl-10"
               />
             </div>
           </div>
 
-          {error && (
+          {hasError && (
             <div className="bg-error-container rounded-xl px-4 py-3">
-              <p className="text-sm text-error">{error}</p>
+              <p className="text-sm text-error">Неверный email или пароль</p>
             </div>
           )}
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Вход..." : "Войти"} <ArrowRight className="h-4 w-4" />
-          </Button>
+          <button
+            type="submit"
+            className="w-full h-10 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary to-primary-container px-6 py-3 text-base font-medium text-on-primary transition-all hover:opacity-90"
+          >
+            Войти <ArrowRight className="h-4 w-4" />
+          </button>
         </form>
 
         <p className="text-center text-sm text-on-surface-variant">
@@ -116,12 +93,10 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Quote */}
       <p className="text-center text-xs text-on-surface-variant/60 italic">
         «Маленькие шаги ведут к большим переменам.»
       </p>
 
-      {/* Footer links */}
       <div className="flex justify-center gap-4 text-xs text-on-surface-variant/40 mt-4">
         <a href="#">Политика</a>
         <span>·</span>
